@@ -57,8 +57,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
@@ -77,6 +75,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sun.security.provider.certpath.SunCertPathBuilderException;
 import sun.security.validator.ValidatorException;
@@ -153,7 +153,7 @@ import static usn.net.ssl.util.InstallCert.findTrustStores;
  */
 public class InstallCert {
 
-    private static final Logger LOG = Logger.getLogger(InstallCert.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(InstallCert.class.getName());
     private static final char[] DEFAULT = "changeit".toCharArray();
     final static String PROGRAM_TERMINATED = "Program terminated.";
 
@@ -176,7 +176,7 @@ public class InstallCert {
             FileWriter fw = new FileWriter(file);
             fw.write(certToString(cert));
             fw.close();
-            System.out.println("Cert saved to: " + file.getAbsolutePath());
+            LOG.info("Cert saved to: " + file.getAbsolutePath());
         }
     }
 
@@ -240,7 +240,7 @@ public class InstallCert {
                 wrapper.store = getKeyStore(wrapper.keyStoreLocation, wrapper.keyStorePassword);
                 wrappers.add(wrapper);
             } catch (Exception ex) {
-                LOG.log(Level.WARNING, ex.getMessage(), ex);
+                LOG.warn(ex.getMessage(), ex);
             }
         }
         cacerts = new File(file, "jre/lib/security/cacerts");
@@ -252,7 +252,7 @@ public class InstallCert {
                 wrapper.store = getKeyStore(wrapper.keyStoreLocation, wrapper.keyStorePassword);
                 wrappers.add(wrapper);
             } catch (Exception ex) {
-                LOG.log(Level.WARNING, ex.getMessage(), ex);
+                LOG.warn(ex.getMessage(), ex);
             }
         }
         return wrappers;
@@ -323,12 +323,12 @@ public class InstallCert {
         try {
             sha1 = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(InstallCert.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("",ex);
         }
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(InstallCert.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("", ex);
         }
     }
 
@@ -401,7 +401,7 @@ public class InstallCert {
             try {
                 tmf.init(wrapper.store);
             } catch (Exception ex) {
-                LOG.log(Level.WARNING, "failed to apply trust store " + wrapper.keyStoreLocation.getAbsolutePath(), ex);
+                LOG.warn("failed to apply trust store " + wrapper.keyStoreLocation.getAbsolutePath(), ex);
             }
         }
 
